@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sandesh Sweets</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div class="top-strip">
+        Fresh sweets • Bulk orders • Pickup available • Order via WhatsApp, Zomato or Swiggy
+    </div>
+
+    <header class="site-header">
+        <div class="header-top">
+            <form id="searchForm" class="search-box">
+                <input
+                    type="search"
+                    id="searchInput"
+                    placeholder="Search sweets, snacks, chat..."
+                    aria-label="Search menu"
+                />
+                <button type="submit">Search</button>
+            </form>
+
+            <div class="brand">
+                <div class="brand-mark" aria-hidden="true">
+                    <span class="brand-mark-text">श्री</span>
+                </div>
+                <div class="brand-text">
+                    <h1>Sandesh Sweets</h1>
+                    <p>Traditional taste, modern ordering</p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </div>
+
+        <nav class="main-nav">
+            <button class="nav-chip active" data-filter="all">All</button>
+            {% for category in categories %}
+                <button class="nav-chip" data-filter="{{ category.slug }}">{{ category.name }}</button>
+            {% endfor %}
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-card">
+            <div class="hero-badge">Popular Menu</div>
+            <div class="hero-slider" data-hero-slider>
+                <div class="hero-slider-track">
+                {% for promo in hero_promos %}
+                <article class="hero-slide{% if loop.first %} is-active{% endif %}">
+                    <a class="hero-promo-card hero-promo-card-main" href="#menu">
+                        <div class="hero-promo-copy">
+                            <span class="hero-promo-label">{% if loop.first %}Best Seller{% else %}Popular Pick{% endif %}</span>
+                            <h3>{{ promo.name }}</h3>
+                            <p class="hero-promo-price">₹{{ promo.price }}</p>
+                            <p class="hero-promo-unit">{{ promo.unit }}</p>
+                        </div>
+                        <div class="hero-promo-media">
+                            <img src="{{ promo.image_url }}" alt="{{ promo.image_alt }}" class="hero-promo-image" loading="lazy">
+                        </div>
+                    </a>
+                </article>
+                {% endfor %}
+                </div>
+                {% if hero_promos|length > 1 %}
+                <div class="hero-slider-controls">
+                    <button type="button" class="hero-slider-arrow" data-hero-prev aria-label="Previous popular dish">&#8249;</button>
+                    <div class="hero-slider-dots">
+                        {% for promo in hero_promos %}
+                        <button
+                            type="button"
+                            class="hero-slider-dot{% if loop.first %} is-active{% endif %}"
+                            data-hero-dot="{{ loop.index0 }}"
+                            aria-label="Show {{ promo.name }}"
+                        ></button>
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="hero-slider-arrow" data-hero-next aria-label="Next popular dish">&#8250;</button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <section class="category-showcase">
+        {% for category in categories %}
+        <div
+            class="showcase-card {{ category.theme }}"
+            {% if category.image_url %}
+            style="background-image: linear-gradient(135deg, rgba(42, 18, 6, 0.45), rgba(201, 103, 34, 0.28)), url('{{ category.image_url }}'); background-position: {{ category.image_position }}; background-size: {{ category.image_size }};"
+            {% endif %}
+        >
+            <div class="showcase-content">
+                <span class="showcase-label">Category</span>
+                <h3>{{ category.name }}</h3>
+                <p>{{ category.desc }}</p>
+                <button class="showcase-btn" data-jump-btn="{{ category.slug }}">View Products</button>
+            </div>
+        </div>
+        {% endfor %}
+    </section>
+
+    <section class="section-head" id="menu">
+        <p class="section-kicker">Our Menu</p>
+        <h2>Browse Menu Items</h2>
+        <p>The full menu is grouped by category, just like your printed menu.</p>
+    </section>
+
+    <main class="product-section">
+        <div id="noResults" class="no-results hidden">
+            No matching items found. Try a different keyword.
+        </div>
+
+        <div class="menu-groups" id="productGrid">
+            {% for category in categories %}
+            <section class="menu-group" data-category-group="{{ category.slug }}">
+                <div class="menu-group-head">
+                    <p class="section-kicker">{{ category.name }}</p>
+                    <h3>{{ category.desc }}</h3>
+                </div>
+
+                <div class="product-grid">
+                    {% for item in category["items"] %}
+                    <article
+                        class="product-card{% if item.featured %} featured-card{% endif %}"
+                        data-name="{{ item.name|lower }}"
+                        data-category="{{ category.slug }}"
+                    >
+                        {% if item.image_url %}
+                        <div class="product-media">
+                            <img
+                                src="{{ item.image_url }}"
+                                alt="{{ item.image_alt or item.name }}"
+                                class="product-image"
+                                loading="lazy"
+                            >
+                        </div>
+                        {% endif %}
+
+                        <div class="product-body">
+                            {% if item.featured %}
+                                <span class="product-badge">Featured Pick</span>
+                            {% endif %}
+                            <h3>{{ item.name }}</h3>
+                            <p class="product-price">₹{{ item.price }}</p>
+                            <p class="product-unit">{{ item.unit }}</p>
+
+                            {% if item.addons is defined %}
+                                <p class="product-addons">{{ item.addons }}</p>
+                            {% endif %}
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endfor %}
+        </div>
+    </main>
+
+    <section class="about-section" id="about">
+        <div class="about-copy">
+            <p class="section-kicker">About Us</p>
+            <h2>Simple digital menu for a local sweets shop</h2>
+            <p>
+                Sandesh Sweets is designed to make browsing easy and ordering convenient.
+                Instead of adding unnecessary login, cart, or checkout complexity, the focus
+                stays on menu visibility, category-based browsing, and quick contact.
+            </p>
+            <p>
+                Customers can explore the menu, check pricing and units, and order through
+                WhatsApp, Zomato, or Swiggy depending on what is most convenient for them.
+            </p>
+        </div>
+
+        <div class="about-panel">
+            <div class="about-stat">
+                <span>50+</span>
+                <p>menu items</p>
+            </div>
+            <div class="about-stat">
+                <span>9</span>
+                <p>main categories</p>
+            </div>
+            <div class="about-stat">
+                <span>3</span>
+                <p>ordering platforms</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="newsletter">
+        <div>
+            <p class="section-kicker">Stay Updated</p>
+            <h3>Get festive updates and special menu highlights</h3>
+        </div>
+
+        <form class="newsletter-form" onsubmit="event.preventDefault()">
+            <input type="email" placeholder="Enter your email address" />
+            <button type="submit">Subscribe</button>
+        </form>
+    </section>
+
+    <footer class="site-footer" id="contact">
+        <div class="footer-grid">
+            <div>
+                <h4>Quick Links</h4>
+                <a href="#menu">Menu</a>
+                <a href="#about">About Us</a>
+                <a href="#contact">Contact</a>
+            </div>
+
+            <div>
+                <h4>Categories</h4>
+                {% for category in categories %}
+                    <a href="#menu">{{ category.name }}</a>
+                {% endfor %}
+            </div>
+
+            <div>
+                <h4>Reach Us</h4>
+                <p>Phone: +91 XXXXXXXXXX</p>
+                <p>Email: hello@sandeshsweets.com</p>
+                <p>Pickup available. Delivery via platform coordination.</p>
+            </div>
+
+            <div>
+                <h4>Order From</h4>
+                <a class="order-platform" href="https://wa.me/91XXXXXXXXXX" target="_blank">
+                    <img src="{{ url_for('static', filename='images/logos/whatsapp-3.svg') }}" alt="WhatsApp logo" class="order-platform-logo">
+                    <span>WhatsApp</span>
+                </a>
+                <a class="order-platform" href="#" target="_blank">
+                    <img src="{{ url_for('static', filename='images/logos/zomato-1.svg') }}" alt="Zomato logo" class="order-platform-logo zomato-wordmark">
+                    <span>Zomato</span>
+                </a>
+                <a class="order-platform" href="#" target="_blank">
+                    <img src="{{ url_for('static', filename='images/logos/swiggy-1.svg') }}" alt="Swiggy logo" class="order-platform-logo">
+                    <span>Swiggy</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2026 Sandesh Sweets. Designed for local sweets shop showcase.</p>
+        </div>
+    </footer>
+
+    <div class="floating-order-links">
+        <a class="float-link whatsapp" href="https://wa.me/91XXXXXXXXXX" target="_blank" aria-label="WhatsApp">
+            <img src="{{ url_for('static', filename='images/logos/whatsapp-3.svg') }}" alt="" class="float-link-logo">
+        </a>
+        <a class="float-link zomato" href="#" target="_blank" aria-label="Zomato">
+            <img src="{{ url_for('static', filename='images/logos/zomato-1.svg') }}" alt="" class="float-link-logo zomato-float-logo">
+        </a>
+        <a class="float-link swiggy" href="#" target="_blank" aria-label="Swiggy">
+            <img src="{{ url_for('static', filename='images/logos/swiggy-1.svg') }}" alt="" class="float-link-logo">
+        </a>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

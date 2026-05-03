@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Owner Login | Sandesh Sweets</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="admin-page">
+    <main class="admin-auth">
+        <section class="admin-auth-card">
+            <p class="section-kicker">Owner Access</p>
+            <h1>Manage Menu Updates</h1>
+            <p class="admin-note">Use the owner password to update products, seasonal specials, prices, and optional image paths.</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="post" class="admin-form">
+                <label class="admin-field">
+                    <span>Password</span>
+                    <input type="password" name="password" placeholder="Enter owner password" required>
+                </label>
+                <button type="submit" class="primary-btn admin-submit">Open Dashboard</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

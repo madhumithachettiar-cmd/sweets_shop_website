@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard | Sandesh Sweets</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="admin-page">
+    <header class="admin-header">
+        <div>
+            <p class="section-kicker">Admin Dashboard</p>
+            <h1>Update Products Anytime</h1>
+            <p class="admin-note">Add seasonal items, edit prices, remove sold-out products, or attach manual image paths.</p>
+        </div>
+
+        <div class="admin-header-actions">
+            <a href="{{ url_for('index') }}" class="secondary-btn">View Website</a>
+            <form method="post" action="{{ url_for('admin_logout') }}">
+                <button type="submit" class="admin-logout">Logout</button>
+            </form>
+        </div>
+    </header>
+
+    <main class="admin-layout">
+        <section class="admin-panel">
+            <h2>Add Product</h2>
+            <form method="post" action="{{ url_for('admin_add_product') }}" class="admin-form admin-grid-form">
+                <label class="admin-field">
+                    <span>Name</span>
+                    <input type="text" name="name" placeholder="e.g. Kesar Rasmalai" required>
+                </label>
+
+                <label class="admin-field">
+                    <span>Category</span>
+                    <input list="category-options" name="category" placeholder="Choose or type category" required>
+                    <datalist id="category-options">
+                        {% for category in category_order %}
+                            <option value="{{ category }}"></option>
+                        {% endfor %}
+                    </datalist>
+                </label>
+
+                <label class="admin-field">
+                    <span>Price</span>
+                    <input type="number" name="price" min="1" step="1" required>
+                </label>
+
+                <label class="admin-field">
+                    <span>Unit</span>
+                    <input type="text" name="unit" placeholder="e.g. 250 grams / 4 pieces" required>
+                </label>
+
+                <label class="admin-field admin-field-wide">
+                    <span>Addons</span>
+                    <input type="text" name="addons" placeholder="Optional extra pricing or notes">
+                </label>
+
+                <label class="admin-field admin-field-wide">
+                    <span>Image Path</span>
+                    <input type="text" name="image" placeholder="images/products/kesar-rasmalai.jpg">
+                </label>
+
+                <button type="submit" class="primary-btn admin-submit">Add Product</button>
+            </form>
+        </section>
+
+        <section class="admin-panel">
+            <h2>Manage Existing Products</h2>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="admin-product-list">
+                {% for product in products %}
+                <article class="admin-product-card">
+                    <div class="admin-product-top">
+                        <div>
+                            <p class="section-kicker">{{ product.category }}</p>
+                            <h3>{{ product.name }}</h3>
+                        </div>
+                        <form method="post" action="{{ url_for('admin_delete_product', product_id=product.id) }}">
+                            <button type="submit" class="admin-delete">Delete</button>
+                        </form>
+                    </div>
+
+                    <form method="post" action="{{ url_for('admin_edit_product', product_id=product.id) }}" class="admin-form admin-grid-form">
+                        <label class="admin-field">
+                            <span>Name</span>
+                            <input type="text" name="name" value="{{ product.name }}" required>
+                        </label>
+
+                        <label class="admin-field">
+                            <span>Category</span>
+                            <input list="category-options" name="category" value="{{ product.category }}" required>
+                        </label>
+
+                        <label class="admin-field">
+                            <span>Price</span>
+                            <input type="number" name="price" min="1" step="1" value="{{ product.price }}" required>
+                        </label>
+
+                        <label class="admin-field">
+                            <span>Unit</span>
+                            <input type="text" name="unit" value="{{ product.unit }}" required>
+                        </label>
+
+                        <label class="admin-field admin-field-wide">
+                            <span>Addons</span>
+                            <input type="text" name="addons" value="{{ product.addons or '' }}">
+                        </label>
+
+                        <label class="admin-field admin-field-wide">
+                            <span>Image Path</span>
+                            <input type="text" name="image" value="{{ product.image or '' }}" placeholder="images/products/product-name.jpg">
+                        </label>
+
+                        <button type="submit" class="primary-btn admin-submit">Save Changes</button>
+                    </form>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+</body>
+</html>
